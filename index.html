@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave & Task Handover Form — Midha</title>
+
+<!-- ============================================================
+  CONFIGURATION — Fill these 5 values before going live
+  ============================================================ -->
+<script>
+  var CONFIG = {
+    EMAILJS_PUBLIC_KEY:  "q-bvPrz_MTcBM36Pz",
+    EMAILJS_SERVICE_ID:  "service_7tsdwaz",
+    EMAILJS_TEMPLATE_ID: "template_b2gqbs5",
+    SHEETS_WEBHOOK_URL:  "https://script.google.com/macros/s/AKfycbwKiVMtkEFuRa9psZ7P81GqJx7CgByc6msqKoXqNqgVgiduTcyjKWsbSzU2YOGj36my/exec",
+    HR_EMAIL:            "hr@midha.in",
+    ORG_NAME:            "Midha Education Private Limited"
+  };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0B5D47;--teal-d:#063D2F;--teal-l:#E1F5EE;--teal-m:#9FE1CB;
+  --amb-l:#FAEEDA;--amb-m:#FAC775;--amb-d:#4F2E03;
+  --blu-l:#E6F1FB;--blu-m:#85B7EB;--blu-d:#093359;
+  --red-l:#FCEBEB;--red-m:#F09595;--red-d:#611414;
+  --bg:#ffffff;--bg2:#f8f8f6;--bg3:#f2f1ee;
+  --bdr:rgba(0,0,0,0.18);--bdr2:rgba(0,0,0,0.32);
+  --tx:#0f0f0d;--tx2:#333330;--tx3:#67675f;
+  --r:8px;--rl:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;color:var(--tx);background:var(--bg3);min-height:100vh}
+.page{max-width:1080px;margin:0 auto;padding:2.5rem 2rem 5rem}
+.page-header{display:flex;align-items:center;gap:16px;margin-bottom:2.5rem;padding-bottom:1.75rem;border-bottom:0.5px solid var(--bdr)}
+.hicon{width:52px;height:52px;border-radius:var(--r);background:var(--teal-l);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hicon svg{width:26px;height:26px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.htitle{font-size:23px;font-weight:500}
+.hsub{font-size:15px;color:var(--tx2);margin-top:4px}
+.hbadge{margin-left:auto;font-size:13px;padding:5px 12px;background:var(--bg2);border:0.5px solid var(--bdr2);border-radius:var(--r);color:var(--tx2);white-space:nowrap;font-weight:500}
+.stepper{display:flex;align-items:center;margin-bottom:2.25rem}
+.step{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--tx2)}
+.step-num{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0;background:var(--bg)}
+.step.active .step-num{background:var(--teal);border-color:var(--teal);color:#fff}
+.step.done .step-num{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal)}
+.step.active .step-lbl{color:var(--tx);font-weight:500}
+.step-line{flex:1;height:0.5px;background:var(--bdr);margin:0 10px}
+.card{background:var(--bg);border:0.5px solid var(--bdr2);border-radius:var(--rl);margin-bottom:1.25rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.ch{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:0.5px solid var(--bdr);background:var(--bg2)}
+.ci{width:34px;height:34px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci svg{width:18px;height:18px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.ci-t{background:var(--teal-l)}.ci-t svg{stroke:var(--teal)}
+.ci-a{background:var(--amb-l)}.ci-a svg{stroke:var(--amb-d)}
+.ci-b{background:var(--blu-l)}.ci-b svg{stroke:var(--blu-d)}
+.ci-r{background:var(--red-l)}.ci-r svg{stroke:var(--red-d)}
+.ctitle{font-size:17px;font-weight:500;flex:1}
+.hrbadge{font-size:13px;font-weight:500;padding:4px 11px;border-radius:99px;background:var(--amb-l);color:var(--amb-d);display:none}
+.cb{padding:22px}
+.fg{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.fg:last-child{margin-bottom:0}
+.fl{font-size:14px;font-weight:500;color:var(--tx2)}
+.req{color:#a32d2d;margin-left:2px}
+.opt{font-size:13px;font-weight:400;background:var(--bg2);padding:2px 8px;border-radius:var(--r);margin-left:4px;color:var(--tx3)}
+.em{font-size:13px;color:#a32d2d;margin-top:4px;display:none}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+input[type=text],input[type=date],input[type=email],select,textarea{width:100%;font-size:15px;padding:10px 14px;border:0.5px solid var(--bdr2);border-radius:var(--r);background:var(--bg);color:var(--tx);font-family:inherit;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,110,86,.08)}
+textarea{resize:vertical;min-height:78px}
+input[readonly]{background:var(--bg2);cursor:default;color:var(--tx2)}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.75rem}
+.mopt{padding:16px 18px;border:0.5px solid var(--bdr);border-radius:var(--rl);cursor:pointer;transition:all .15s;background:var(--bg)}
+.mopt:hover{border-color:var(--bdr2);background:var(--bg2)}
+.mopt.sel-e{border-color:var(--teal-m);background:var(--teal-l)}
+.mopt.sel-h{border-color:var(--amb-m);background:var(--amb-l)}
+.mopt input[type=radio]{display:none}
+.mt{font-size:16px;font-weight:500;display:flex;align-items:center;gap:9px}
+.mt svg{width:19px;height:19px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke:var(--tx2)}
+.sel-e .mt{color:var(--teal-d)}.sel-e .mt svg{stroke:var(--teal)}
+.sel-h .mt{color:var(--amb-d)}.sel-h .mt svg{stroke:var(--amb-d)}
+.ms{font-size:14px;color:var(--tx2);line-height:1.5;margin-top:5px}
+.rrow{display:flex;gap:10px;flex-wrap:wrap}
+.ropt{display:flex;align-items:center;gap:8px;padding:10px 16px;border:0.5px solid var(--bdr);border-radius:var(--r);cursor:pointer;font-size:15px;background:var(--bg);transition:all .15s}
+.ropt input{width:16px;height:16px;margin:0;accent-color:var(--teal)}
+.ropt.sp{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal-d)}
+.ropt.su{background:var(--amb-l);border-color:var(--amb-m);color:var(--amb-d)}
+.ropt.sm{background:var(--blu-l);border-color:var(--blu-m);color:var(--blu-d)}
+.notice{display:flex;gap:10px;padding:13px 16px;border-radius:var(--r);font-size:14px;line-height:1.6;margin-top:12px}
+.notice svg{width:18px;height:18px;flex-shrink:0;margin-top:1px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.nt{background:var(--teal-l);border:0.5px solid var(--teal-m);color:var(--teal-d)}.nt svg{stroke:var(--teal)}
+.na{background:var(--amb-l);border:0.5px solid var(--amb-m);color:var(--amb-d)}.na svg{stroke:var(--amb-d)}
+.nb{background:var(--blu-l);border:0.5px solid var(--blu-m);color:var(--blu-d)}.nb svg{stroke:var(--blu-d)}
+.tw{background:var(--bg2);border:0.5px solid var(--bdr);border-radius:var(--r);padding:16px 18px}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
+.tm{font-size:15px;font-weight:500}.ts{font-size:13px;color:var(--tx2);margin-top:3px}
+.tsw{position:relative;width:42px;height:23px;flex-shrink:0}
+.tsw input{opacity:0;width:0;height:0;position:absolute}
+.tsl{position:absolute;inset:0;background:var(--bdr2);border-radius:99px;transition:.2s;cursor:pointer}
+.tsl::before{content:'';position:absolute;width:17px;height:17px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+input:checked+.tsl{background:var(--teal)}
+input:checked+.tsl::before{transform:translateX(19px)}
+.cex{display:none;margin-top:14px}.cex.open{display:block}
+.dv{height:0.5px;background:var(--bdr);margin:14px 0}
+.taskwrap{overflow-x:auto}
+.ttbl{width:100%;border-collapse:collapse;table-layout:fixed;min-width:640px}
+.ttbl th{font-size:13px;font-weight:500;color:var(--tx2);padding:10px 12px;border-bottom:0.5px solid var(--bdr);background:var(--bg2);text-align:left}
+.ttbl td{padding:10px 10px;border-bottom:0.5px solid var(--bdr);vertical-align:top}
+.ttbl tbody tr:last-child td{border-bottom:none}
+.ttbl td input,.ttbl td textarea{font-size:14px}
+.ttbl td textarea{min-height:64px}
+.cd{width:38%}.ca{width:30%}.cr{width:24%}.cx{width:8%}
+.dbtn{background:none;border:none;cursor:pointer;color:var(--tx3);font-size:22px;padding:4px 8px;display:flex;align-items:center;justify-content:center;width:100%;line-height:1}
+.dbtn:hover{color:#a32d2d}
+.sp{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:4px 11px;border-radius:99px;white-space:nowrap}
+.sp-w{background:var(--bg2);color:var(--tx2);border:0.5px solid var(--bdr)}
+.sp-g{background:var(--blu-l);color:var(--blu-d);border:0.5px solid var(--blu-m)}
+.sp-s{background:var(--blu-l);color:var(--blu-d);border:0.5px solid var(--blu-m)}
+.sp-a{background:var(--teal-l);color:var(--teal-d);border:0.5px solid var(--teal-m)}
+.sp-d{background:var(--red-l);color:var(--red-d);border:0.5px solid var(--red-m)}
+.srbtn{font-size:13px;padding:6px 13px;border-radius:var(--r);cursor:pointer;background:var(--bg2);border:0.5px solid var(--bdr2);color:var(--tx2);margin-top:8px;display:inline-flex;align-items:center;gap:5px;font-family:inherit;transition:all .15s}
+.srbtn:hover{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal-d)}
+.srbtn:disabled{opacity:.5;cursor:not-allowed}
+.addbtn{font-size:14px;padding:8px 18px;color:var(--tx2);background:var(--bg2);border:0.5px dashed var(--bdr2);border-radius:var(--r);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-family:inherit;transition:all .15s}
+.addbtn:hover{background:var(--bg);border-style:solid}
+.abar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:var(--bg2);border:0.5px solid var(--bdr);border-radius:var(--rl);margin-top:1.25rem}
+.ahint{font-size:14px;color:var(--tx2);line-height:1.5}
+.brow{display:flex;gap:10px;flex-shrink:0}
+.bsec{font-size:15px;padding:10px 18px;border-radius:var(--r);cursor:pointer;background:var(--bg);border:0.5px solid var(--bdr2);color:var(--tx2);font-family:inherit;transition:all .15s}
+.bsec:hover{background:var(--bg2)}
+.bpri{font-size:15px;padding:10px 22px;border-radius:var(--r);cursor:pointer;background:var(--teal);border:none;color:#fff;font-weight:500;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
+.bpri:hover{background:var(--teal-d)}
+.bpri:disabled{background:var(--teal-m);cursor:not-allowed}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:var(--r);font-size:15px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.ts-ok{background:var(--teal);color:#fff}
+.ts-er{background:#a32d2d;color:#fff}
+.swrap{text-align:center;padding:4.5rem 1rem}
+.sico{width:68px;height:68px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.sico svg{width:32px;height:32px;stroke:var(--teal);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.stitle{font-size:22px;font-weight:500;margin-bottom:10px}
+.ssub{font-size:15px;color:var(--tx2);line-height:1.6;max-width:520px;margin:0 auto 1.75rem}
+.pill-row{margin-bottom:1.75rem}
+.spill{display:inline-flex;align-items:center;gap:7px;padding:7px 15px;background:var(--bg2);border:0.5px solid var(--bdr);border-radius:99px;font-size:14px;color:var(--tx2);margin:4px}
+.nxt{font-size:14px;color:var(--tx2);background:var(--bg2);padding:18px 22px;border-radius:var(--rl);display:inline-block;text-align:left;max-width:520px;line-height:2}
+.nxt strong{display:block;margin-bottom:6px;color:var(--tx)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="hicon">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+    </div>
+    <div>
+      <div class="htitle">Leave &amp; Task Handover Form</div>
+      <div class="hsub">Task continuity &middot; Accountability &middot; No operational delays</div>
+    </div>
+    <div class="hbadge">FORM-LHO-2026</div>
+  </div>
+
+  <div class="stepper">
+    <div class="step active" id="si1"><div class="step-num" id="sn1">1</div><span class="step-lbl">Leave details &amp; tasks</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="si2"><div class="step-num" id="sn2">2</div><span class="step-lbl">Submitted</span></div>
+  </div>
+
+  <div id="step1">
+
+    <div class="mode-grid">
+      <label class="mopt" id="mopt-e" onclick="setMode('emp')">
+        <input type="radio" name="fmode" value="emp">
+        <div class="mt"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Employee filling</div>
+        <div class="ms">Planned leave — employee fills before their leave date.</div>
+      </label>
+      <label class="mopt" id="mopt-h" onclick="setMode('hr')">
+        <input type="radio" name="fmode" value="hr">
+        <div class="mt"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>HR filling on behalf</div>
+        <div class="ms">Unplanned / emergency / medical — employee absent, HR fills and assigns tasks.</div>
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci ci-t"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="ctitle">Employee details</span><span class="hrbadge" id="badge-emp">Filled by HR</span></div>
+      <div class="cb">
+        <div class="r2" style="margin-bottom:14px">
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="emp-name">Full name <span class="req">*</span></label><input type="text" id="emp-name" placeholder="Employee's full name"><span class="em" id="err-name">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="emp-role">Role / position <span class="req">*</span></label><input type="text" id="emp-role" placeholder="e.g. Accounts Executive"><span class="em" id="err-role">Required</span></div>
+        </div>
+        <div class="r3" style="margin-bottom:14px">
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-from">Leave from <span class="req">*</span></label><input type="date" id="lv-from"><span class="em" id="err-from">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-to">Leave to <span class="req">*</span></label><input type="date" id="lv-to"><span class="em" id="err-to">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl">Duration</label><input type="text" id="lv-days" readonly placeholder="Auto-calculated"></div>
+        </div>
+        <div class="tw">
+          <label class="trow" onclick="toggleContact()">
+            <div><div class="tm">Permission to contact during leave</div><div class="ts">Allow HR or concerned person to reach if urgently needed</div></div>
+            <div class="tsw"><input type="checkbox" id="ctog"><span class="tsl"></span></div>
+          </label>
+          <div class="cex" id="cex">
+            <div class="dv"></div>
+            <div class="r3">
+              <div class="fg" style="margin-bottom:0"><label class="fl">Phone</label><input type="text" id="c-phone" placeholder="+91 98765 43210"></div>
+              <div class="fg" style="margin-bottom:0"><label class="fl">Alternate email</label><input type="email" id="c-email" placeholder="personal@email.com"></div>
+              <div class="fg" style="margin-bottom:0"><label class="fl">Best time to reach</label><input type="text" id="c-time" placeholder="e.g. after 6pm"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci ci-a"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><span class="ctitle">Leave details</span></div>
+      <div class="cb">
+        <div class="fg">
+          <label class="fl">Leave type <span class="req">*</span></label>
+          <div class="rrow">
+            <label class="ropt" id="rp" onclick="setLtype('planned')"><input type="radio" name="ltype" value="planned"> Planned</label>
+            <label class="ropt" id="ru" onclick="setLtype('unplanned')"><input type="radio" name="ltype" value="unplanned"> Unplanned / emergency</label>
+            <label class="ropt" id="rm" onclick="setLtype('medical')"><input type="radio" name="ltype" value="medical"> Medical</label>
+          </div>
+          <span class="em" id="err-type">Please select a leave type</span>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl" for="lv-reason">Reason for leave <span class="req">*</span></label>
+          <textarea id="lv-reason" placeholder="Reason for leave (required)"></textarea>
+          <span class="em" id="err-reason">Required</span>
+        </div>
+        <div class="notice nt" id="np" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><span>Planned leave — task handover is <strong>mandatory</strong>. Submit at least 48 hours before leave date.</span></div>
+        <div class="notice na" id="nu" style="display:none"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Unplanned / emergency — HR is filling this form and will assign temporary task ownership.</span></div>
+        <div class="notice nb" id="nm" style="display:none"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Medical leave — HR is filling this form and will coordinate task coverage.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci ci-b"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg></div><span class="ctitle">Pending tasks &amp; handover</span><span class="hrbadge" id="badge-tasks">Filled by HR</span></div>
+      <div class="cb">
+        <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.6">Add each pending task and assign it to a colleague. Click <strong>Send request</strong> — they receive an email asking them to accept or decline. Their response appears in the last column.</p>
+        <div class="taskwrap">
+          <table class="ttbl" id="ttbl">
+            <thead><tr><th class="cd">Task description <span style="color:#a32d2d">*</span></th><th class="ca">Assignee name &amp; email <span style="color:#a32d2d">*</span></th><th class="cr">Response</th><th class="cx"></th></tr></thead>
+            <tbody id="task-rows"></tbody>
+          </table>
+        </div>
+        <button class="addbtn" onclick="addTask()">+ Add task row</button>
+      </div>
+    </div>
+
+    <div class="card" id="card-hra" style="display:none">
+      <div class="ch"><div class="ci ci-r"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="ctitle">HR task assignment</span><span class="hrbadge" style="display:inline-flex">HR action</span></div>
+      <div class="cb">
+        <div class="r2" style="margin-bottom:12px">
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-assign">Temporarily assigned to <span class="req">*</span></label><input type="text" id="hr-assign" placeholder="Person taking over"><span class="em" id="err-hra">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-ae">Their email</label><input type="email" id="hr-ae" placeholder="person@midha.in"></div>
+        </div>
+        <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-notes">HR notes <span class="opt">optional</span></label><textarea id="hr-notes" placeholder="Special instructions or escalation contacts" style="min-height:52px"></textarea></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><div class="ci ci-r"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div><span class="ctitle">HR representative</span></div>
+      <div class="cb">
+        <div class="r2">
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-rep">Name <span class="req">*</span></label><input type="text" id="hr-rep" placeholder="HR person's name"><span class="em" id="err-hr">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-st">Status</label><select id="hr-st"><option value="">— select —</option><option>Approved</option><option>Approved with conditions</option><option>Pending review</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="abar">
+      <div class="ahint">&#128274; Submitted to hr@midha.in &nbsp;&middot;&nbsp; Assignees notified by email &nbsp;&middot;&nbsp; Saved to Google Sheets</div>
+      <div class="brow">
+        <button class="bsec" onclick="saveDraft(this)">&#128190; Save draft</button>
+        <button class="bpri" id="sbtn" onclick="submitForm()">&#10148; Submit form</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="step2" style="display:none">
+    <div class="swrap">
+      <div class="sico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
+      <div class="stitle">Form submitted successfully</div>
+      <div class="ssub">A copy has been sent to <strong>hr@midha.in</strong>. All assignees have been notified by email. Every response is saved to Google Sheets in real time.</div>
+      <div class="pill-row" id="pill-row"></div>
+      <div class="nxt">
+        <strong>What happens next</strong>
+        Each assignee receives an email with the task and leave details.<br>
+        They click Accept or Decline — response saves to Google Sheets.<br>
+        HR views all submissions and responses in the shared sheet.<br>
+        For unplanned / medical, HR directly manages task coverage.
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){ emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY); })();
+
+var ltype='', fmode='', tc=0;
+
+function setMode(m){
+  fmode=m; var h=m==='hr';
+  document.getElementById('mopt-e').className='mopt'+(h?'':' sel-e');
+  document.getElementById('mopt-h').className='mopt'+(h?' sel-h':'');
+  document.getElementById('badge-emp').style.display=h?'inline-flex':'none';
+  document.getElementById('badge-tasks').style.display=h?'inline-flex':'none';
+  document.getElementById('card-hra').style.display=h?'block':'none';
+  if(h&&!ltype) setLtype('unplanned');
+}
+
+function setLtype(t){
+  ltype=t;
+  ['rp','ru','rm'].forEach(function(i){document.getElementById(i).classList.remove('sp','su','sm');});
+  ['np','nu','nm'].forEach(function(i){document.getElementById(i).style.display='none';});
+  if(t==='planned'){document.getElementById('rp').classList.add('sp');document.getElementById('np').style.display='flex';}
+  if(t==='unplanned'){document.getElementById('ru').classList.add('su');document.getElementById('nu').style.display='flex';}
+  if(t==='medical'){document.getElementById('rm').classList.add('sm');document.getElementById('nm').style.display='flex';}
+}
+
+function toggleContact(){
+  var cb=document.getElementById('ctog');
+  setTimeout(function(){document.getElementById('cex').classList.toggle('open',cb.checked);},10);
+}
+
+document.getElementById('lv-from').addEventListener('change',calcDays);
+document.getElementById('lv-to').addEventListener('change',calcDays);
+function calcDays(){
+  var f=document.getElementById('lv-from').value,t=document.getElementById('lv-to').value;
+  if(f&&t){var d=Math.round((new Date(t)-new Date(f))/86400000)+1;document.getElementById('lv-days').value=d>0?d+(d===1?' day':' days'):'';}
+}
+
+function fmtDate(v){if(!v)return'—';var p=v.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function showErr(id,s){var e=document.getElementById(id);if(e)e.style.display=s?'block':'none';}
+
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type==='ok'?'ts-ok':'ts-er')+' show';
+  setTimeout(function(){t.className='toast';},3500);
+}
+
+function addTask(){
+  tc++;
+  var i=tc;
+  var tr=document.createElement('tr');
+  tr.id='tr-'+i;
+  tr.innerHTML=
+    '<td class="cd"><textarea placeholder="Describe the task..." rows="3" id="td-'+i+'"></textarea></td>'+
+    '<td class="ca">'+
+      '<input type="text" placeholder="Assignee name" id="an-'+i+'" style="margin-bottom:6px">'+
+      '<input type="email" placeholder="assignee@midha.in" id="ae-'+i+'">'+
+      '<button class="srbtn" id="sb-'+i+'" onclick="sendReq('+i+')">&#9993; Send request</button>'+
+    '</td>'+
+    '<td class="cr" id="rc-'+i+'"><span class="sp sp-w" id="pill-'+i+'">&#9711; Awaiting</span></td>'+
+    '<td class="cx"><button class="dbtn" onclick="delTask('+i+')" aria-label="Remove">&times;</button></td>';
+  document.getElementById('task-rows').appendChild(tr);
+}
+
+function delTask(i){var e=document.getElementById('tr-'+i);if(e)e.remove();}
+
+function setPill(i,s){
+  var e=document.getElementById('pill-'+i); if(!e)return;
+  var m={w:['sp-w','&#9711; Awaiting'],g:['sp-g','&#8635; Sending...'],s:['sp-s','&#9993; Email sent'],a:['sp-a','&#10003; Accepted'],d:['sp-d','&#10007; Declined']};
+  e.className='sp '+m[s][0]; e.innerHTML=m[s][1];
+}
+
+function sendReq(i){
+  var task=(document.getElementById('td-'+i).value||'').trim();
+  var aName=(document.getElementById('an-'+i).value||'').trim();
+  var aEmail=(document.getElementById('ae-'+i).value||'').trim();
+  var eName=(document.getElementById('emp-name').value||'(Employee)').trim();
+  var eRole=(document.getElementById('emp-role').value||'').trim();
+  var lvF=document.getElementById('lv-from').value;
+  var lvT=document.getElementById('lv-to').value;
+  var lvD=document.getElementById('lv-days').value||'—';
+  if(!task){showToast('Please enter a task description first.','er');return;}
+  if(!aName){showToast('Please enter the assignee name.','er');return;}
+  if(!aEmail){showToast('Please enter the assignee email.','er');return;}
+  var btn=document.getElementById('sb-'+i);
+  btn.disabled=true; setPill(i,'g');
+
+  var base=CONFIG.SHEETS_WEBHOOK_URL;
+  var acceptUrl=base+'?action=respond&tid='+i+'&response=accepted&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task);
+  var declineUrl=base+'?action=respond&tid='+i+'&response=declined&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task);
+
+  emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+    to_name:aName, to_email:aEmail,
+    emp_name:eName, emp_role:eRole,
+    leave_from:fmtDate(lvF), leave_to:fmtDate(lvT), leave_days:lvD,
+    task_desc:task,
+    accept_url:acceptUrl, decline_url:declineUrl,
+    org_name:CONFIG.ORG_NAME, hr_email:CONFIG.HR_EMAIL
+  }).then(function(){
+    setPill(i,'s'); btn.textContent='&#10003; Sent';
+    showToast('Request sent to '+aName,'ok');
+    saveTaskResponse(i,eName,aName,aEmail,task,'Email sent');
+  }).catch(function(err){
+    btn.disabled=false; setPill(i,'w');
+    showToast('Failed to send. Check EmailJS config.','er');
+    console.error(err);
+  });
+}
+
+function saveTaskResponse(tid,emp,aName,aEmail,task,status){
+  if(!CONFIG.SHEETS_WEBHOOK_URL||CONFIG.SHEETS_WEBHOOK_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL') return;
+  fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:'task_response',timestamp:new Date().toISOString(),employee:emp,assignee_name:aName,assignee_email:aEmail,task:task,status:status})
+  }).catch(function(){});
+}
+
+function submitForm(){
+  var ok=true;
+  function chk(id,eid){var v=(document.getElementById(id).value||'').trim();if(!v){showErr(eid,true);ok=false;}else showErr(eid,false);return v;}
+  var empName=chk('emp-name','err-name'); chk('emp-role','err-role');
+  chk('lv-from','err-from'); chk('lv-to','err-to');
+  if(!ltype){showErr('err-type',true);ok=false;}else showErr('err-type',false);
+  chk('lv-reason','err-reason'); chk('hr-rep','err-hr');
+  if(fmode==='hr') chk('hr-assign','err-hra');
+  if(!ok){showToast('Please fill all required fields.','er');return;}
+
+  var btn=document.getElementById('sbtn'); btn.disabled=true; btn.textContent='Submitting...';
+
+  var tasks=[];
+  document.querySelectorAll('#task-rows tr').forEach(function(tr){
+    var i=tr.id.replace('tr-','');
+    var pill=document.getElementById('pill-'+i);
+    tasks.push({task:(document.getElementById('td-'+i)||{}).value||'',assignee_name:(document.getElementById('an-'+i)||{}).value||'',assignee_email:(document.getElementById('ae-'+i)||{}).value||'',response:pill?pill.textContent.trim():'Awaiting'});
+  });
+
+  var payload={
+    submitted_at:new Date().toISOString(), form_mode:fmode||'not set',
+    emp_name:document.getElementById('emp-name').value, emp_role:document.getElementById('emp-role').value,
+    leave_from:fmtDate(document.getElementById('lv-from').value), leave_to:fmtDate(document.getElementById('lv-to').value),
+    leave_days:document.getElementById('lv-days').value, leave_type:ltype,
+    reason:document.getElementById('lv-reason').value,
+    contact_ok:document.getElementById('ctog').checked?'Yes':'No',
+    contact_phone:document.getElementById('c-phone').value,
+    contact_email:document.getElementById('c-email').value,
+    contact_time:document.getElementById('c-time').value,
+    hr_assign:fmode==='hr'?document.getElementById('hr-assign').value:'',
+    hr_notes:fmode==='hr'?document.getElementById('hr-notes').value:'',
+    hr_rep:document.getElementById('hr-rep').value,
+    hr_status:document.getElementById('hr-st').value,
+    tasks:JSON.stringify(tasks)
+  };
+
+  if(CONFIG.SHEETS_WEBHOOK_URL&&CONFIG.SHEETS_WEBHOOK_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
+    fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
+  }
+
+  var from=document.getElementById('lv-from').value, to=document.getElementById('lv-to').value;
+  var days=document.getElementById('lv-days').value;
+  var pr=document.getElementById('pill-row');
+  pr.innerHTML='<span class="spill">&#128100; '+empName+'</span><span class="spill">&#128197; '+fmtDate(from)+' — '+fmtDate(to)+' ('+days+')</span><span class="spill">&#127991; '+(ltype.charAt(0).toUpperCase()+ltype.slice(1))+' leave</span><span class="spill">&#10003; '+tasks.length+' task'+(tasks.length===1?'':'s')+' assigned</span>';
+
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  document.getElementById('si1').className='step done'; document.getElementById('sn1').textContent='✓';
+  document.getElementById('si2').className='step active'; document.getElementById('sn2').textContent='✓';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function saveDraft(btn){
+  btn.textContent='✓ Saved';
+  setTimeout(function(){btn.textContent='💾 Save draft';},2000);
+}
+</script>
+</body>
+</html>
