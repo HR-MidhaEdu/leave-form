@@ -174,25 +174,24 @@ input:checked+.tsl::before{transform:translateX(19px)}
       <label class="mopt" id="mopt-e" onclick="setMode('emp')">
         <input type="radio" name="fmode" value="emp">
         <div class="mt"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Employee filling</div>
-        <div class="ms">Planned leave — employee fills before their leave date.</div>
       </label>
       <label class="mopt" id="mopt-h" onclick="setMode('hr')">
         <input type="radio" name="fmode" value="hr">
         <div class="mt"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>HR filling on behalf</div>
-        <div class="ms">Unplanned / emergency / medical — employee absent, HR fills and assigns tasks.</div>
       </label>
     </div>
 
     <div class="card">
       <div class="ch"><div class="ci ci-t"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="ctitle">Employee details</span><span class="hrbadge" id="badge-emp">Filled by HR</span></div>
       <div class="cb">
-        <div class="r2" style="margin-bottom:14px">
+        <div class="r3" style="margin-bottom:14px">
           <div class="fg" style="margin-bottom:0"><label class="fl" for="emp-name">Full name <span class="req">*</span></label><input type="text" id="emp-name" placeholder="Employee's full name"><span class="em" id="err-name">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="emp-email">Email <span class="req">*</span></label><input type="email" id="emp-email" placeholder="employee@midha.in"><span class="em" id="err-email">Required</span></div>
           <div class="fg" style="margin-bottom:0"><label class="fl" for="emp-role">Role / position <span class="req">*</span></label><input type="text" id="emp-role" placeholder="e.g. Accounts Executive"><span class="em" id="err-role">Required</span></div>
         </div>
         <div class="r3" style="margin-bottom:14px">
-          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-from">Leave from <span class="req">*</span></label><input type="date" id="lv-from"><span class="em" id="err-from">Required</span></div>
-          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-to">Leave to <span class="req">*</span></label><input type="date" id="lv-to"><span class="em" id="err-to">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-from">Leave from <span class="req">*</span></label><input type="date" id="lv-from" min="2000-01-01" max="2100-12-31"><span class="em" id="err-from">Required</span></div>
+          <div class="fg" style="margin-bottom:0"><label class="fl" for="lv-to">Leave to <span class="req">*</span></label><input type="date" id="lv-to" min="2000-01-01" max="2100-12-31"><span class="em" id="err-to">Required</span></div>
           <div class="fg" style="margin-bottom:0"><label class="fl">Duration</label><input type="text" id="lv-days" readonly placeholder="Auto-calculated"></div>
         </div>
         <div class="tw">
@@ -200,14 +199,6 @@ input:checked+.tsl::before{transform:translateX(19px)}
             <div><div class="tm">Permission to contact during leave</div><div class="ts">Allow HR or concerned person to reach if urgently needed</div></div>
             <div class="tsw"><input type="checkbox" id="ctog"><span class="tsl"></span></div>
           </label>
-          <div class="cex" id="cex">
-            <div class="dv"></div>
-            <div class="r3">
-              <div class="fg" style="margin-bottom:0"><label class="fl">Phone</label><input type="text" id="c-phone" placeholder="+91 98765 43210"></div>
-              <div class="fg" style="margin-bottom:0"><label class="fl">Alternate email</label><input type="email" id="c-email" placeholder="personal@email.com"></div>
-              <div class="fg" style="margin-bottom:0"><label class="fl">Best time to reach</label><input type="text" id="c-time" placeholder="e.g. after 6pm"></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -230,8 +221,8 @@ input:checked+.tsl::before{transform:translateX(19px)}
           <span class="em" id="err-reason">Required</span>
         </div>
         <div class="notice nt" id="np" style="display:none"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><span>Planned leave — task handover is <strong>mandatory</strong>. Submit at least 48 hours before leave date.</span></div>
-        <div class="notice na" id="nu" style="display:none"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Unplanned / emergency — HR is filling this form and will assign temporary task ownership.</span></div>
-        <div class="notice nb" id="nm" style="display:none"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Medical leave — HR is filling this form and will coordinate task coverage.</span></div>
+        <div class="notice na" id="nu" style="display:none"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Unplanned / emergency leave — temporary task ownership will be assigned.</span></div>
+        <div class="notice nb" id="nm" style="display:none"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Medical leave — task coverage will be coordinated during this period.</span></div>
       </div>
     </div>
 
@@ -257,16 +248,6 @@ input:checked+.tsl::before{transform:translateX(19px)}
           <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-ae">Their email</label><input type="email" id="hr-ae" placeholder="person@midha.in"></div>
         </div>
         <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-notes">HR notes <span class="opt">optional</span></label><textarea id="hr-notes" placeholder="Special instructions or escalation contacts" style="min-height:52px"></textarea></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="ch"><div class="ci ci-r"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div><span class="ctitle">HR representative</span></div>
-      <div class="cb">
-        <div class="r2">
-          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-rep">Name <span class="req">*</span></label><input type="text" id="hr-rep" placeholder="HR person's name"><span class="em" id="err-hr">Required</span></div>
-          <div class="fg" style="margin-bottom:0"><label class="fl" for="hr-st">Status</label><select id="hr-st"><option value="">— select —</option><option>Approved</option><option>Approved with conditions</option><option>Pending review</option></select></div>
-        </div>
       </div>
     </div>
 
@@ -322,15 +303,31 @@ function setLtype(t){
   if(t==='medical'){document.getElementById('rm').classList.add('sm');document.getElementById('nm').style.display='flex';}
 }
 
-function toggleContact(){
-  var cb=document.getElementById('ctog');
-  setTimeout(function(){document.getElementById('cex').classList.toggle('open',cb.checked);},10);
-}
-
 document.getElementById('lv-from').addEventListener('change',calcDays);
 document.getElementById('lv-to').addEventListener('change',calcDays);
+document.getElementById('lv-from').addEventListener('input',clampYear);
+document.getElementById('lv-to').addEventListener('input',clampYear);
+
+function clampYear(e){
+  var val=e.target.value;
+  if(!val) return;
+  var parts=val.split('-');
+  if(parts[0] && parts[0].length>4){
+    parts[0]=parts[0].slice(0,4);
+    e.target.value=parts.join('-');
+  }
+}
+
 function calcDays(){
-  var f=document.getElementById('lv-from').value,t=document.getElementById('lv-to').value;
+  var fEl=document.getElementById('lv-from'), tEl=document.getElementById('lv-to');
+  var f=fEl.value, t=tEl.value;
+  var fYear=f?parseInt(f.split('-')[0],10):0;
+  var tYear=t?parseInt(t.split('-')[0],10):0;
+  var bad=false;
+  showErr('err-from',false); showErr('err-to',false);
+  if(f && (fYear<2000||fYear>2100)){document.getElementById('err-from').textContent='Enter a valid 4-digit year';showErr('err-from',true);bad=true;}
+  if(t && (tYear<2000||tYear>2100)){document.getElementById('err-to').textContent='Enter a valid 4-digit year';showErr('err-to',true);bad=true;}
+  if(bad){document.getElementById('lv-days').value='';return;}
   if(f&&t){var d=Math.round((new Date(t)-new Date(f))/86400000)+1;document.getElementById('lv-days').value=d>0?d+(d===1?' day':' days'):'';}
 }
 
@@ -373,6 +370,7 @@ function sendReq(i){
   var aName=(document.getElementById('an-'+i).value||'').trim();
   var aEmail=(document.getElementById('ae-'+i).value||'').trim();
   var eName=(document.getElementById('emp-name').value||'(Employee)').trim();
+  var eEmail=(document.getElementById('emp-email').value||'').trim();
   var eRole=(document.getElementById('emp-role').value||'').trim();
   var lvF=document.getElementById('lv-from').value;
   var lvT=document.getElementById('lv-to').value;
@@ -380,12 +378,13 @@ function sendReq(i){
   if(!task){showToast('Please enter a task description first.','er');return;}
   if(!aName){showToast('Please enter the assignee name.','er');return;}
   if(!aEmail){showToast('Please enter the assignee email.','er');return;}
+  if(!eEmail){showToast('Please enter the employee\'s email at the top first.','er');return;}
   var btn=document.getElementById('sb-'+i);
   btn.disabled=true; setPill(i,'g');
 
   var base=CONFIG.SHEETS_WEBHOOK_URL;
-  var acceptUrl=base+'?action=respond&tid='+i+'&response=accepted&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task);
-  var declineUrl=base+'?action=respond&tid='+i+'&response=declined&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task);
+  var acceptUrl=base+'?action=respond&tid='+i+'&response=accepted&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
+  var declineUrl=base+'?action=respond&tid='+i+'&response=declined&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
 
   emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
     to_name:aName, to_email:aEmail,
@@ -415,12 +414,14 @@ function saveTaskResponse(tid,emp,aName,aEmail,task,status){
 function submitForm(){
   var ok=true;
   function chk(id,eid){var v=(document.getElementById(id).value||'').trim();if(!v){showErr(eid,true);ok=false;}else showErr(eid,false);return v;}
-  var empName=chk('emp-name','err-name'); chk('emp-role','err-role');
+  var empName=chk('emp-name','err-name'); chk('emp-email','err-email'); chk('emp-role','err-role');
   chk('lv-from','err-from'); chk('lv-to','err-to');
+  calcDays();
+  if(document.getElementById('err-from').style.display==='block' || document.getElementById('err-to').style.display==='block') ok=false;
   if(!ltype){showErr('err-type',true);ok=false;}else showErr('err-type',false);
-  chk('lv-reason','err-reason'); chk('hr-rep','err-hr');
+  chk('lv-reason','err-reason');
   if(fmode==='hr') chk('hr-assign','err-hra');
-  if(!ok){showToast('Please fill all required fields.','er');return;}
+  if(!ok){showToast('Please fill all required fields correctly.','er');return;}
 
   var btn=document.getElementById('sbtn'); btn.disabled=true; btn.textContent='Submitting...';
 
@@ -433,24 +434,40 @@ function submitForm(){
 
   var payload={
     submitted_at:new Date().toISOString(), form_mode:fmode||'not set',
-    emp_name:document.getElementById('emp-name').value, emp_role:document.getElementById('emp-role').value,
+    emp_name:document.getElementById('emp-name').value, emp_email:document.getElementById('emp-email').value, emp_role:document.getElementById('emp-role').value,
     leave_from:fmtDate(document.getElementById('lv-from').value), leave_to:fmtDate(document.getElementById('lv-to').value),
     leave_days:document.getElementById('lv-days').value, leave_type:ltype,
     reason:document.getElementById('lv-reason').value,
     contact_ok:document.getElementById('ctog').checked?'Yes':'No',
-    contact_phone:document.getElementById('c-phone').value,
-    contact_email:document.getElementById('c-email').value,
-    contact_time:document.getElementById('c-time').value,
     hr_assign:fmode==='hr'?document.getElementById('hr-assign').value:'',
     hr_notes:fmode==='hr'?document.getElementById('hr-notes').value:'',
-    hr_rep:document.getElementById('hr-rep').value,
-    hr_status:document.getElementById('hr-st').value,
     tasks:JSON.stringify(tasks)
   };
 
   if(CONFIG.SHEETS_WEBHOOK_URL&&CONFIG.SHEETS_WEBHOOK_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
     fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
   }
+
+  var taskListText = tasks.map(function(t,idx){
+    return (idx+1)+'. '+(t.task||'(no description)')+' — Assigned to: '+(t.assignee_name||'—')+' ('+(t.assignee_email||'—')+')';
+  }).join('\n');
+
+  emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+    to_name: 'HR Team',
+    to_email: CONFIG.HR_EMAIL,
+    emp_name: payload.emp_name,
+    emp_role: payload.emp_role,
+    leave_from: payload.leave_from,
+    leave_to: payload.leave_to,
+    leave_days: payload.leave_days,
+    task_desc: 'New leave & handover form submitted by ' + payload.emp_name + '. Leave type: ' + payload.leave_type + '. Reason: ' + payload.reason + (taskListText ? ('\n\nTasks assigned:\n' + taskListText) : '\n\nNo tasks were assigned.'),
+    accept_url: '#', decline_url: '#',
+    org_name: CONFIG.ORG_NAME, hr_email: CONFIG.HR_EMAIL
+  }).then(function(){
+    console.log('HR notified by email');
+  }).catch(function(err){
+    console.warn('HR email notification failed:', err);
+  });
 
   var from=document.getElementById('lv-from').value, to=document.getElementById('lv-to').value;
   var days=document.getElementById('lv-days').value;
@@ -462,12 +479,94 @@ function submitForm(){
   document.getElementById('si1').className='step done'; document.getElementById('sn1').textContent='✓';
   document.getElementById('si2').className='step active'; document.getElementById('sn2').textContent='✓';
   window.scrollTo({top:0,behavior:'smooth'});
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+}
+
+var DRAFT_KEY = 'midha_leave_handover_draft_v1';
+
+function collectDraftData(){
+  var tasks=[];
+  document.querySelectorAll('#task-rows tr').forEach(function(tr){
+    var i=tr.id.replace('tr-','');
+    tasks.push({
+      task:(document.getElementById('td-'+i)||{}).value||'',
+      assignee_name:(document.getElementById('an-'+i)||{}).value||'',
+      assignee_email:(document.getElementById('ae-'+i)||{}).value||''
+    });
+  });
+  return {
+    fmode:fmode, ltype:ltype,
+    emp_name:document.getElementById('emp-name').value,
+    emp_email:document.getElementById('emp-email').value,
+    emp_role:document.getElementById('emp-role').value,
+    lv_from:document.getElementById('lv-from').value,
+    lv_to:document.getElementById('lv-to').value,
+    lv_reason:document.getElementById('lv-reason').value,
+    ctog:document.getElementById('ctog').checked,
+    hr_assign:document.getElementById('hr-assign').value,
+    hr_ae:document.getElementById('hr-ae').value,
+    hr_notes:document.getElementById('hr-notes').value,
+    tasks:tasks,
+    saved_at:new Date().toISOString()
+  };
 }
 
 function saveDraft(btn){
-  btn.textContent='✓ Saved';
-  setTimeout(function(){btn.textContent='💾 Save draft';},2000);
+  try{
+    var data=collectDraftData();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    btn.textContent='✓ Saved';
+    showToast('Draft saved in this browser','ok');
+    setTimeout(function(){btn.innerHTML='&#128190; Save draft';},2000);
+  }catch(e){
+    showToast('Could not save draft on this browser.','er');
+    console.error(e);
+  }
 }
+
+function loadDraftIfExists(){
+  var raw;
+  try{ raw=localStorage.getItem(DRAFT_KEY); }catch(e){ return; }
+  if(!raw) return;
+  var data;
+  try{ data=JSON.parse(raw); }catch(e){ return; }
+  if(!data) return;
+
+  var when = data.saved_at ? new Date(data.saved_at).toLocaleString() : 'earlier';
+  var resume = confirm('A saved draft from '+when+' was found. Resume it? (Cancel will discard it and start fresh.)');
+  if(!resume){
+    localStorage.removeItem(DRAFT_KEY);
+    return;
+  }
+
+  if(data.fmode) setMode(data.fmode);
+  document.getElementById('emp-name').value = data.emp_name || '';
+  document.getElementById('emp-email').value = data.emp_email || '';
+  document.getElementById('emp-role').value = data.emp_role || '';
+  document.getElementById('lv-from').value = data.lv_from || '';
+  document.getElementById('lv-to').value = data.lv_to || '';
+  document.getElementById('lv-reason').value = data.lv_reason || '';
+  document.getElementById('ctog').checked = !!data.ctog;
+  document.getElementById('hr-assign').value = data.hr_assign || '';
+  document.getElementById('hr-ae').value = data.hr_ae || '';
+  document.getElementById('hr-notes').value = data.hr_notes || '';
+  if(data.ltype) setLtype(data.ltype);
+  calcDays();
+
+  if(data.tasks && data.tasks.length){
+    data.tasks.forEach(function(t){
+      addTask();
+      var i=tc;
+      document.getElementById('td-'+i).value = t.task || '';
+      document.getElementById('an-'+i).value = t.assignee_name || '';
+      document.getElementById('ae-'+i).value = t.assignee_email || '';
+    });
+  }
+  showToast('Draft restored','ok');
+}
+
+window.addEventListener('load', loadDraftIfExists);
+
 </script>
 </body>
 </html>
