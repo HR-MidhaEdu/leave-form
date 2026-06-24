@@ -6,13 +6,14 @@
 <title>Leave & Task Handover Form — Midha</title>
 
 <!-- ============================================================
-  CONFIGURATION — Fill these 5 values before going live
+  CONFIGURATION — Fill these 6 values before going live
   ============================================================ -->
 <script>
   var CONFIG = {
     EMAILJS_PUBLIC_KEY:  "q-bvPrz_MTcBM36Pz",
     EMAILJS_SERVICE_ID:  "service_7tsdwaz",
-    EMAILJS_TEMPLATE_ID: "template_b2gqbs5",
+    EMAILJS_TEMPLATE_ID: "template_b2gqbs5",     // Template 1: Assignee task-request (Accept/Decline buttons)
+    EMAILJS_HR_TEMPLATE_ID:   "template_rl8epaf",     // Template 2: HR notification on submit (no buttons)
     SHEETS_WEBHOOK_URL:  "https://script.google.com/macros/s/AKfycbwKiVMtkEFuRa9psZ7P81GqJx7CgByc6msqKoXqNqgVgiduTcyjKWsbSzU2YOGj36my/exec",
     HR_EMAIL:            "hr@midha.in",
     ORG_NAME:            "Midha Education Private Limited"
@@ -261,8 +262,9 @@ input:checked+.tsl::before{transform:translateX(19px)}
     <div class="swrap">
       <div class="sico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
       <div class="stitle">Form submitted successfully</div>
-      <div class="ssub">A copy has been sent to <strong>hr@midha.in</strong>. All assignees have been notified by email.</div>
-      <div class="pill-row" id="pill-row"></div>    </div>
+      <div class="ssub">A copy has been sent to <strong>hr@midha.in</strong>. All assignees have been notified by email. </div>
+      <div class="pill-row" id="pill-row"></div>
+    </div>
   </div>
 
 </div>
@@ -435,22 +437,24 @@ function submitForm(){
   // 1. Send a task-request email to every assignee, in parallel
   var taskEmailPromises = taskIds.map(function(i){ return sendTaskEmail(i); });
 
-  // 2. Send the HR confirmation email (full submission summary)
-  var taskListText = tasks.map(function(t,idx){
+  // 2. Send the HR notification email using a separate, button-free template
+  var taskListHtml = tasks.map(function(t,idx){
     return (idx+1)+'. '+(t.task||'(no description)')+' — Assigned to: '+(t.assignee_name||'—')+' ('+(t.assignee_email||'—')+')';
   }).join('\n');
+  if(!taskListHtml) taskListHtml = 'No tasks were assigned.';
 
-  var hrEmailPromise = emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
-    to_name: 'HR Team',
+  var hrEmailPromise = emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_HR_TEMPLATE_ID, {
     to_email: CONFIG.HR_EMAIL,
     emp_name: payload.emp_name,
+    emp_email: payload.emp_email,
     emp_role: payload.emp_role,
     leave_from: payload.leave_from,
     leave_to: payload.leave_to,
     leave_days: payload.leave_days,
-    task_desc: 'New leave & handover form submitted by ' + payload.emp_name + '. Leave type: ' + payload.leave_type + '. Reason: ' + payload.reason + (taskListText ? ('\n\nTasks assigned:\n' + taskListText) : '\n\nNo tasks were assigned.'),
-    accept_url: '#', decline_url: '#',
-    org_name: CONFIG.ORG_NAME, hr_email: CONFIG.HR_EMAIL
+    leave_type: payload.leave_type,
+    reason: payload.reason,
+    task_list: taskListHtml,
+    org_name: CONFIG.ORG_NAME
   }).catch(function(err){
     console.warn('HR email notification failed:', err);
   });
