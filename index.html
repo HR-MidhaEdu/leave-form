@@ -120,9 +120,6 @@ input:checked+.tsl::before{transform:translateX(19px)}
 .sp-s{background:var(--blu-l);color:var(--blu-d);border:0.5px solid var(--blu-m)}
 .sp-a{background:var(--teal-l);color:var(--teal-d);border:0.5px solid var(--teal-m)}
 .sp-d{background:var(--red-l);color:var(--red-d);border:0.5px solid var(--red-m)}
-.srbtn{font-size:13px;padding:6px 13px;border-radius:var(--r);cursor:pointer;background:var(--bg2);border:0.5px solid var(--bdr2);color:var(--tx2);margin-top:8px;display:inline-flex;align-items:center;gap:5px;font-family:inherit;transition:all .15s}
-.srbtn:hover{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal-d)}
-.srbtn:disabled{opacity:.5;cursor:not-allowed}
 .addbtn{font-size:14px;padding:8px 18px;color:var(--tx2);background:var(--bg2);border:0.5px dashed var(--bdr2);border-radius:var(--r);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-family:inherit;transition:all .15s}
 .addbtn:hover{background:var(--bg);border-style:solid}
 .abar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:var(--bg2);border:0.5px solid var(--bdr);border-radius:var(--rl);margin-top:1.25rem}
@@ -229,7 +226,7 @@ input:checked+.tsl::before{transform:translateX(19px)}
     <div class="card">
       <div class="ch"><div class="ci ci-b"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg></div><span class="ctitle">Pending tasks &amp; handover</span><span class="hrbadge" id="badge-tasks">Filled by HR</span></div>
       <div class="cb">
-        <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.6">Add each pending task and assign it to a colleague. Click <strong>Send request</strong> — they receive an email asking them to accept or decline. Their response appears in the last column.</p>
+        <p style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.6">Add each pending task and assign it to a colleague. When you submit the form, every assignee listed below will receive an email asking them to accept or decline their task.</p>
         <div class="taskwrap">
           <table class="ttbl" id="ttbl">
             <thead><tr><th class="cd">Task description <span style="color:#a32d2d">*</span></th><th class="ca">Assignee name &amp; email <span style="color:#a32d2d">*</span></th><th class="cr">Response</th><th class="cx"></th></tr></thead>
@@ -264,16 +261,8 @@ input:checked+.tsl::before{transform:translateX(19px)}
     <div class="swrap">
       <div class="sico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></div>
       <div class="stitle">Form submitted successfully</div>
-      <div class="ssub">A copy has been sent to <strong>hr@midha.in</strong>. All assignees have been notified by email. Every response is saved to Google Sheets in real time.</div>
-      <div class="pill-row" id="pill-row"></div>
-      <div class="nxt">
-        <strong>What happens next</strong>
-        Each assignee receives an email with the task and leave details.<br>
-        They click Accept or Decline — response saves to Google Sheets.<br>
-        HR views all submissions and responses in the shared sheet.<br>
-        For unplanned / medical, HR directly manages task coverage.
-      </div>
-    </div>
+      <div class="ssub">A copy has been sent to <strong>hr@midha.in</strong>. All assignees have been notified by email.</div>
+      <div class="pill-row" id="pill-row"></div>    </div>
   </div>
 
 </div>
@@ -350,9 +339,8 @@ function addTask(){
     '<td class="ca">'+
       '<input type="text" placeholder="Assignee name" id="an-'+i+'" style="margin-bottom:6px">'+
       '<input type="email" placeholder="assignee@midha.in" id="ae-'+i+'">'+
-      '<button class="srbtn" id="sb-'+i+'" onclick="sendReq('+i+')">&#9993; Send request</button>'+
     '</td>'+
-    '<td class="cr" id="rc-'+i+'"><span class="sp sp-w" id="pill-'+i+'">&#9711; Awaiting</span></td>'+
+    '<td class="cr" id="rc-'+i+'"><span class="sp sp-w" id="pill-'+i+'">&#9711; Will notify on submit</span></td>'+
     '<td class="cx"><button class="dbtn" onclick="delTask('+i+')" aria-label="Remove">&times;</button></td>';
   document.getElementById('task-rows').appendChild(tr);
 }
@@ -361,11 +349,11 @@ function delTask(i){var e=document.getElementById('tr-'+i);if(e)e.remove();}
 
 function setPill(i,s){
   var e=document.getElementById('pill-'+i); if(!e)return;
-  var m={w:['sp-w','&#9711; Awaiting'],g:['sp-g','&#8635; Sending...'],s:['sp-s','&#9993; Email sent'],a:['sp-a','&#10003; Accepted'],d:['sp-d','&#10007; Declined']};
+  var m={w:['sp-w','&#9711; Will notify on submit'],g:['sp-g','&#8635; Sending...'],s:['sp-s','&#9993; Email sent'],a:['sp-a','&#10003; Accepted'],d:['sp-d','&#10007; Declined']};
   e.className='sp '+m[s][0]; e.innerHTML=m[s][1];
 }
 
-function sendReq(i){
+function sendTaskEmail(i){
   var task=(document.getElementById('td-'+i).value||'').trim();
   var aName=(document.getElementById('an-'+i).value||'').trim();
   var aEmail=(document.getElementById('ae-'+i).value||'').trim();
@@ -375,18 +363,19 @@ function sendReq(i){
   var lvF=document.getElementById('lv-from').value;
   var lvT=document.getElementById('lv-to').value;
   var lvD=document.getElementById('lv-days').value||'—';
-  if(!task){showToast('Please enter a task description first.','er');return;}
-  if(!aName){showToast('Please enter the assignee name.','er');return;}
-  if(!aEmail){showToast('Please enter the assignee email.','er');return;}
-  if(!eEmail){showToast('Please enter the employee\'s email at the top first.','er');return;}
-  var btn=document.getElementById('sb-'+i);
-  btn.disabled=true; setPill(i,'g');
+
+  if(!task||!aName||!aEmail){
+    setPill(i,'w');
+    return Promise.resolve();
+  }
+
+  setPill(i,'g');
 
   var base=CONFIG.SHEETS_WEBHOOK_URL;
   var acceptUrl=base+'?action=respond&tid='+i+'&response=accepted&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
   var declineUrl=base+'?action=respond&tid='+i+'&response=declined&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
 
-  emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+  return emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
     to_name:aName, to_email:aEmail,
     emp_name:eName, emp_role:eRole,
     leave_from:fmtDate(lvF), leave_to:fmtDate(lvT), leave_days:lvD,
@@ -394,13 +383,11 @@ function sendReq(i){
     accept_url:acceptUrl, decline_url:declineUrl,
     org_name:CONFIG.ORG_NAME, hr_email:CONFIG.HR_EMAIL
   }).then(function(){
-    setPill(i,'s'); btn.textContent='&#10003; Sent';
-    showToast('Request sent to '+aName,'ok');
+    setPill(i,'s');
     saveTaskResponse(i,eName,aName,aEmail,task,'Email sent');
   }).catch(function(err){
-    btn.disabled=false; setPill(i,'w');
-    showToast('Failed to send. Check EmailJS config.','er');
-    console.error(err);
+    setPill(i,'w');
+    console.error('Task email failed for row '+i, err);
   });
 }
 
@@ -423,13 +410,14 @@ function submitForm(){
   if(fmode==='hr') chk('hr-assign','err-hra');
   if(!ok){showToast('Please fill all required fields correctly.','er');return;}
 
-  var btn=document.getElementById('sbtn'); btn.disabled=true; btn.textContent='Submitting...';
+  var btn=document.getElementById('sbtn'); btn.disabled=true; btn.textContent='Sending emails & submitting...';
 
+  var taskIds=[];
   var tasks=[];
   document.querySelectorAll('#task-rows tr').forEach(function(tr){
     var i=tr.id.replace('tr-','');
-    var pill=document.getElementById('pill-'+i);
-    tasks.push({task:(document.getElementById('td-'+i)||{}).value||'',assignee_name:(document.getElementById('an-'+i)||{}).value||'',assignee_email:(document.getElementById('ae-'+i)||{}).value||'',response:pill?pill.textContent.trim():'Awaiting'});
+    taskIds.push(i);
+    tasks.push({task:(document.getElementById('td-'+i)||{}).value||'',assignee_name:(document.getElementById('an-'+i)||{}).value||'',assignee_email:(document.getElementById('ae-'+i)||{}).value||''});
   });
 
   var payload={
@@ -444,15 +432,15 @@ function submitForm(){
     tasks:JSON.stringify(tasks)
   };
 
-  if(CONFIG.SHEETS_WEBHOOK_URL&&CONFIG.SHEETS_WEBHOOK_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
-    fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
-  }
+  // 1. Send a task-request email to every assignee, in parallel
+  var taskEmailPromises = taskIds.map(function(i){ return sendTaskEmail(i); });
 
+  // 2. Send the HR confirmation email (full submission summary)
   var taskListText = tasks.map(function(t,idx){
     return (idx+1)+'. '+(t.task||'(no description)')+' — Assigned to: '+(t.assignee_name||'—')+' ('+(t.assignee_email||'—')+')';
   }).join('\n');
 
-  emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+  var hrEmailPromise = emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
     to_name: 'HR Team',
     to_email: CONFIG.HR_EMAIL,
     emp_name: payload.emp_name,
@@ -463,12 +451,20 @@ function submitForm(){
     task_desc: 'New leave & handover form submitted by ' + payload.emp_name + '. Leave type: ' + payload.leave_type + '. Reason: ' + payload.reason + (taskListText ? ('\n\nTasks assigned:\n' + taskListText) : '\n\nNo tasks were assigned.'),
     accept_url: '#', decline_url: '#',
     org_name: CONFIG.ORG_NAME, hr_email: CONFIG.HR_EMAIL
-  }).then(function(){
-    console.log('HR notified by email');
   }).catch(function(err){
     console.warn('HR email notification failed:', err);
   });
 
+  // 3. Once all emails are attempted, save to Sheets and show success
+  Promise.all(taskEmailPromises.concat([hrEmailPromise])).then(function(){
+    if(CONFIG.SHEETS_WEBHOOK_URL&&CONFIG.SHEETS_WEBHOOK_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
+      fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
+    }
+    finishSubmit(empName, tasks);
+  });
+}
+
+function finishSubmit(empName, tasks){
   var from=document.getElementById('lv-from').value, to=document.getElementById('lv-to').value;
   var days=document.getElementById('lv-days').value;
   var pr=document.getElementById('pill-row');
