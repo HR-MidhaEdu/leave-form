@@ -11,6 +11,18 @@ const RESPONSE_SHEET = 'Task Responses';
 const SUBMISSION_SHEET = 'Leave Submissions';
 const BACKEND_VERSION = '2026-08-31-v2';
 
+/** Run this once from the Apps Script editor to authorize and verify Gmail. */
+function testEmailSetup() {
+  const recipient = Session.getEffectiveUser().getEmail();
+  if (!recipient) throw new Error('Apps Script could not determine the executing account email.');
+  GmailApp.sendEmail(
+    recipient,
+    '[Leave form test] Gmail setup is working',
+    'Backend ' + BACKEND_VERSION + ' can send email successfully.'
+  );
+  console.log('Test email sent to ' + recipient);
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse((e && e.postData && e.postData.contents) || '{}');

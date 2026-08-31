@@ -18,6 +18,23 @@ the original Gmail thread.
    **Backend version 2026-08-31-v2 is deployed and ready.** If it does not,
    the form is still calling an older deployment.
 
+Use the public URL form below in `index.html`:
+
+`https://script.google.com/macros/s/DEPLOYMENT_ID/exec`
+
+Do not use the domain-prefixed form
+`https://script.google.com/a/macros/midha.in/s/.../exec` from a Vercel page.
+That URL can redirect the cross-origin submission to Google sign-in before
+`doPost` runs.
+
+If mail still does not arrive, open **Apps Script > Executions** immediately
+after submitting:
+
+- No new `doPost` execution means the deployment URL or access setting is wrong.
+- A failed `doPost` execution will show the Gmail/Sheets authorization error.
+- A completed `doPost` means the message was sent by the account shown under
+  **Execute as**; check that account's Sent folder and the recipient's spam.
+
 Test with two tasks assigned to the same email address. The assignee should
 receive one email containing both tasks. After accepting or declining a task,
 using either button for that same task again must show **Already responded**.
