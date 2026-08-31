@@ -6,21 +6,15 @@
 <title>Leave & Task Handover Form — Midha</title>
 
 <!-- ============================================================
-  CONFIGURATION — Fill these 6 values before going live
+  CONFIGURATION — Set the Apps Script deployment URL before going live
   ============================================================ -->
 <script>
   var CONFIG = {
-    EMAILJS_PUBLIC_KEY:  "q-bvPrz_MTcBM36Pz",
-    EMAILJS_SERVICE_ID:  "service_7tsdwaz",
-    EMAILJS_TEMPLATE_ID: "template_b2gqbs5",     // Template 1: Assignee task-request (Accept/Decline buttons)
-    EMAILJS_HR_TEMPLATE_ID:   "template_rl8epaf",     // Template 2: HR notification on submit (no buttons)
     SHEETS_WEBHOOK_URL:  "https://script.google.com/macros/s/AKfycbxHDvboNyyz-WPE361xpTMOFHIqq-JKGJsxUTLTDp9maMAJVZtdQufwXJzBlNvLrw54/exec",
     HR_EMAIL:            "hr@midha.in",
     ORG_NAME:            "Midha Education Private Limited"
   };
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -271,8 +265,6 @@ input:checked+.tsl::before{transform:translateX(19px)}
 <div class="toast" id="toast"></div>
 
 <script>
-(function(){ emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY); })();
-
 var ltype='', fmode='', tc=0;
 
 function setMode(m){
@@ -355,49 +347,9 @@ function setPill(i,s){
   e.className='sp '+m[s][0]; e.innerHTML=m[s][1];
 }
 
-function sendTaskEmail(i){
-  var task=(document.getElementById('td-'+i).value||'').trim();
-  var aName=(document.getElementById('an-'+i).value||'').trim();
-  var aEmail=(document.getElementById('ae-'+i).value||'').trim();
-  var eName=(document.getElementById('emp-name').value||'(Employee)').trim();
-  var eEmail=(document.getElementById('emp-email').value||'').trim();
-  var eRole=(document.getElementById('emp-role').value||'').trim();
-  var lvF=document.getElementById('lv-from').value;
-  var lvT=document.getElementById('lv-to').value;
-  var lvD=document.getElementById('lv-days').value||'—';
-
-  if(!task||!aName||!aEmail){
-    setPill(i,'w');
-    return Promise.resolve();
-  }
-
-  setPill(i,'g');
-
-  var base=CONFIG.SHEETS_WEBHOOK_URL;
-  var acceptUrl=base+'?action=respond&tid='+i+'&response=accepted&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
-  var declineUrl=base+'?action=respond&tid='+i+'&response=declined&emp='+encodeURIComponent(eName)+'&task='+encodeURIComponent(task)+'&aname='+encodeURIComponent(aName)+'&aemail='+encodeURIComponent(aEmail)+'&eemail='+encodeURIComponent(eEmail);
-
-  return emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
-    to_name:aName, to_email:aEmail,
-    emp_name:eName, emp_role:eRole,
-    leave_from:fmtDate(lvF), leave_to:fmtDate(lvT), leave_days:lvD,
-    task_desc:task,
-    accept_url:acceptUrl, decline_url:declineUrl,
-    org_name:CONFIG.ORG_NAME, hr_email:CONFIG.HR_EMAIL
-  }).then(function(){
-    setPill(i,'s');
-    saveTaskResponse(i,eName,aName,aEmail,task,'Email sent');
-  }).catch(function(err){
-    setPill(i,'w');
-    console.error('Task email failed for row '+i, err);
-  });
-}
-
-function saveTaskResponse(tid,emp,aName,aEmail,task,status){
-  if(!CONFIG.SHEETS_WEBHOOK_URL||CONFIG.SHEETS_WEBHOOK_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL') return;
-  fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({type:'task_response',timestamp:new Date().toISOString(),employee:emp,assignee_name:aName,assignee_email:aEmail,task:task,status:status})
-  }).catch(function(){});
+function newSubmissionId(){
+  if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+  return 'leave-'+Date.now()+'-'+Math.random().toString(36).slice(2);
 }
 
 function submitForm(){
@@ -414,15 +366,20 @@ function submitForm(){
 
   var btn=document.getElementById('sbtn'); btn.disabled=true; btn.textContent='Sending emails & submitting...';
 
-  var taskIds=[];
   var tasks=[];
   document.querySelectorAll('#task-rows tr').forEach(function(tr){
     var i=tr.id.replace('tr-','');
-    taskIds.push(i);
-    tasks.push({task:(document.getElementById('td-'+i)||{}).value||'',assignee_name:(document.getElementById('an-'+i)||{}).value||'',assignee_email:(document.getElementById('ae-'+i)||{}).value||''});
+    var task=(document.getElementById('td-'+i).value||'').trim();
+    var assigneeName=(document.getElementById('an-'+i).value||'').trim();
+    var assigneeEmail=(document.getElementById('ae-'+i).value||'').trim();
+    if(task||assigneeName||assigneeEmail){
+      tasks.push({row_id:i,task:task,assignee_name:assigneeName,assignee_email:assigneeEmail});
+      setPill(i,'g');
+    }
   });
 
   var payload={
+    type:'leave_submission', submission_id:newSubmissionId(),
     submitted_at:new Date().toISOString(), form_mode:fmode||'not set',
     emp_name:document.getElementById('emp-name').value, emp_email:document.getElementById('emp-email').value, emp_role:document.getElementById('emp-role').value,
     leave_from:fmtDate(document.getElementById('lv-from').value), leave_to:fmtDate(document.getElementById('lv-to').value),
@@ -431,40 +388,23 @@ function submitForm(){
     contact_ok:document.getElementById('ctog').checked?'Yes':'No',
     hr_assign:fmode==='hr'?document.getElementById('hr-assign').value:'',
     hr_notes:fmode==='hr'?document.getElementById('hr-notes').value:'',
-    tasks:JSON.stringify(tasks)
+    tasks:tasks
   };
 
-  // 1. Send a task-request email to every assignee, in parallel
-  var taskEmailPromises = taskIds.map(function(i){ return sendTaskEmail(i); });
-
-  // 2. Send the HR notification email using a separate, button-free template
-  var taskListHtml = tasks.map(function(t,idx){
-    return (idx+1)+'. '+(t.task||'(no description)')+' — Assigned to: '+(t.assignee_name||'—')+' ('+(t.assignee_email||'—')+')';
-  }).join('\n');
-  if(!taskListHtml) taskListHtml = 'No tasks were assigned.';
-
-  var hrEmailPromise = emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_HR_TEMPLATE_ID, {
-    to_email: CONFIG.HR_EMAIL,
-    emp_name: payload.emp_name,
-    emp_email: payload.emp_email,
-    emp_role: payload.emp_role,
-    leave_from: payload.leave_from,
-    leave_to: payload.leave_to,
-    leave_days: payload.leave_days,
-    leave_type: payload.leave_type,
-    reason: payload.reason,
-    task_list: taskListHtml,
-    org_name: CONFIG.ORG_NAME
-  }).catch(function(err){
-    console.warn('HR email notification failed:', err);
-  });
-
-  // 3. Once all emails are attempted, save to Sheets and show success
-  Promise.all(taskEmailPromises.concat([hrEmailPromise])).then(function(){
-    if(CONFIG.SHEETS_WEBHOOK_URL&&CONFIG.SHEETS_WEBHOOK_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
-      fetch(CONFIG.SHEETS_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
-    }
+  // The backend sends one consolidated email per assignee and atomically owns
+  // the response state, so the first Accept/Decline click is final.
+  fetch(CONFIG.SHEETS_WEBHOOK_URL,{
+    method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload)
+  }).then(function(){
+    tasks.forEach(function(t){setPill(t.row_id,'s');});
     finishSubmit(empName, tasks);
+  }).catch(function(err){
+    tasks.forEach(function(t){setPill(t.row_id,'w');});
+    btn.disabled=false; btn.textContent='Submit leave & notify assignees';
+    console.error('Submission failed:',err);
+    showToast('Could not submit. Please check your connection and try again.','er');
   });
 }
 
